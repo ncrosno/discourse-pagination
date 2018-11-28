@@ -1,0 +1,10 @@
+.influx-pagination {
+  a, b {
+    padding: 0 10px;
+    display: inline-block;
+  }
+  a.disabled {
+    color: #ccc;
+    cursor: not-allowed;
+  }
+}

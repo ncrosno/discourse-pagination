@@ -1,0 +1,112 @@
+<span class='influx-pagination'>
+  <a class='infx_prev_page'>&lt; Previous</a>
+
+  <a class='infx_first_page'>1</a>
+  <span class='prev_elipsis'>&#8230;</span>
+
+  <a class='infx_prev_page infx_pg_minus_one'></a>
+  <b><i class='infx_page_num'></i></b> 
+  <a class='infx_next_page infx_pg_plus_one'></a>
+
+  <span class='next_elipsis'>&#8230;</span>
+  <a class='infx_last_page'></a>
+
+  <a class='infx_next_page' href='#'>Next &gt;</a>
+</span>
+
+
+<a class='infx_gtp' {{action 'goToPage'}}></a>
+
+<script>
+
+  var influx_pagination = {
+    cat: window.location.pathname.split('/').pop(),
+    perpage: 30,
+    dpage: 1,
+    load: function(){
+      var url = new URL(window.location.href);
+      var page = url.searchParams.get("page");
+      if( !page ){ page = 0; }
+      this.dpage = parseInt(page,10)+1;
+
+      var prev_page = this.dpage-1;
+      var next_page = this.dpage+1;
+
+      /* default category to latest if needed */
+      if( !this.cat ){
+        this.cat = 'latest';
+      }
+
+      /* set the display */
+      $( ".infx_pg_minus_one" ).html( prev_page );
+      $( ".infx_page_num" ).html( this.dpage );
+      $( ".infx_pg_plus_one" ).html( next_page );
+
+      /* if we're on the first page, disable this stuff */
+      if( this.dpage == 1 ){
+        $('.infx_first_page, .infx_pg_minus_one, .prev_elipsis').hide();
+        $('.infx_prev_page').addClass('disabled').removeAttr('href');
+      }
+      /* if there is only one previous page, hide the redundant stuff */
+      if( this.dpage == 2 ){
+        $('.infx_first_page, .prev_elipsis').hide();
+      }
+
+      /* update the links */
+      var furl = new URL(window.location.href);
+      furl.searchParams.set("page", 0);
+      $('.infx_first_page').attr('href', furl.href);
+      var purl = new URL(window.location.href);
+      purl.searchParams.set("page", prev_page-1);
+      $('.infx_prev_page').attr('href', purl.href);
+      var nurl = new URL(window.location.href);
+      nurl.searchParams.set("page", next_page-1);
+      $('.infx_next_page').attr('href', nurl.href);
+
+      // copy entire thing to bottom of page
+      $('footer.topic-list-bottom .influx-pagination').remove();
+      $('.influx-pagination').clone().prependTo('footer.topic-list-bottom');
+
+      $('.influx-pagination a').on('click', function(e){
+        history.pushState({},"",this.href);
+        $('.infx_gtp').click();
+        e.preventDefault();
+      });
+
+      $.get( '/influx_pagination/topics/'+this.cat+'/total', function( data ) {
+        if( data.success ){
+
+          var last_page = Math.ceil( data.total / influx_pagination.perpage );
+
+          /* if there is only one more page, hide the redundant stuff */
+          if( influx_pagination.dpage+1 == last_page ){
+            $( ".next_elipsis, .infx_last_page" ).hide();
+          }
+          /* if we are on the last page */
+          if( influx_pagination.dpage == last_page ){
+            $( ".next_elipsis, .infx_last_page, .infx_pg_plus_one" ).hide();
+            $('.infx_next_page').addClass('disabled').removeAttr('href');
+          }
+          else {
+            /* setup link for the last page */
+            var lurl = new URL(window.location.href);
+            lurl.searchParams.set("page", last_page-1);
+            $('.infx_last_page').html( last_page );
+            $('.infx_last_page').attr('href', lurl.href);
+          }
+        }
+      });
+
+      /* scroll to hash location because it doesn't exist at first */
+      if( location.hash ){
+        var tmphash = location.hash;
+        location.hash = '#_';
+        location.hash = tmphash;      
+      }
+
+    }
+  }
+  $(document).ready(function(){
+    influx_pagination.load();
+  });
+</script>
