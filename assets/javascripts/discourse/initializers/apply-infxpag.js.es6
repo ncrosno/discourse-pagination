@@ -4,11 +4,6 @@ function initializeInfxPag(api) {
 
   api.modifyClass('component:discovery-topics-list', {
     
-    pageNum: 0,
-    _init: function() {
-      this.addObserver("pageNum", this.goToPage);
-    }.on("init"),
-
     actions: {
       loadMore() { 
         // override default method to prevent the ajax loading when hitting the bottom of the page.
@@ -39,8 +34,8 @@ function initializeInfxPag(api) {
 
   });
 
-
 }
+
 
 export default {
   name: "apply-infxpag",

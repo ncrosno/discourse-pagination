@@ -24,6 +24,13 @@
     perpage: 30,
     dpage: 1,
     load: function(){
+
+      // hide the pagination and quit unless we are viewing a category
+      if( !this.cat ){
+        $('.influx-pagination').hide();
+        return false;
+      }
+
       var url = new URL(window.location.href);
       var page = url.searchParams.get("page");
       if( !page ){ page = 0; }
@@ -31,11 +38,6 @@
 
       var prev_page = this.dpage-1;
       var next_page = this.dpage+1;
-
-      /* default category to latest if needed */
-      if( !this.cat ){
-        this.cat = 'latest';
-      }
 
       /* set the display */
       $( ".infx_pg_minus_one" ).html( prev_page );
