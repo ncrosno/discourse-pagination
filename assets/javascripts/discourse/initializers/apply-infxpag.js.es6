@@ -6,7 +6,7 @@ function initializeInfxPag(api) {
     
     actions: {
       loadMore() { 
-        // override default method to prevent the ajax loading when hitting the bottom of the page.
+        // Override default method to prevent the ajax loading when hitting the bottom of the page.
         return false;
       },
 
@@ -14,10 +14,10 @@ function initializeInfxPag(api) {
         var url = new URL(window.location.href);
         this.model.set('more_topics_url',url.href);
 
-        // remove all topics:
+        // Remove existing topics so we are not adding more on top of them.
         this.model.set('topics',[]);
 
-        // load next page of data
+        // Load next page of data - this is the heart of the original loadMore()
         this.get("model")
           .loadMore()
           .then(hasMoreResults => {

@@ -65,16 +65,12 @@
       nurl.searchParams.set("page", next_page-1);
       $('.infx_next_page').attr('href', nurl.href);
 
-      // copy entire thing to bottom of page
+      /* copy entire thing to bottom of page - but first remove the old footer */
       $('footer.topic-list-bottom .influx-pagination').remove();
       $('.influx-pagination').clone().prependTo('footer.topic-list-bottom');
 
-      $('.influx-pagination a').on('click', function(e){
-        history.pushState({},"",this.href);
-        $('.infx_gtp').click();
-        e.preventDefault();
-      });
 
+      /* Find the total number of topics for this category, then update the display */
       $.get( '/influx_pagination/topics/'+this.cat+'/total', function( data ) {
         if( data.success ){
 
@@ -99,12 +95,17 @@
         }
       });
 
-      /* scroll to hash location because it doesn't exist at first */
-      if( location.hash ){
-        var tmphash = location.hash;
-        location.hash = '#_';
-        location.hash = tmphash;      
-      }
+
+      /* Hook the pagination links into the Ember action.
+        The 'a.influx_gtp' link above has the handlebar hook to the ember goToPage action.
+        This gets us into Ember at the right level where we have access to the correct model
+        and can make use of it's existing ajax methods. 
+      */
+      $('.influx-pagination a').on('click', function(e){
+        history.pushState({},"",this.href);
+        $('.infx_gtp').click();
+        e.preventDefault();
+      });
 
     }
   }
